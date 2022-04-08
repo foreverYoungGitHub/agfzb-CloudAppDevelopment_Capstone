@@ -15,11 +15,69 @@
 
     <body>
     <!-- Remove this line the first time you edit this file -->
-     This is the index page of your Django app!
+    <!-- This is the index page of your Django app! -->
     <!--Add a nav bar here -->
+    <nav class="navbar navbar-light bg-light">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="{% url 'djangoapp:index' %}">Home</a>
+                <a class="navbar-brand" href="{% url 'djangoapp:about' %}">About Us</a>
+                <a class="navbar-brand" href="{% url 'djangoapp:contact' %}">Contact Us</a>
+            </div>
+
+            {% if user.is_authenticated %}
+            <div>
+                <form class="d-flex" action="{% url 'djangoapp:logout' %}">
+                    <p>{{ user.first_name }} ({{ user.username }})</p>
+                    <button class="btn btn-outline-secondary text-nowrap" type="submit">Logout</button>
+                </form>
+            </div>
+            {% else %}
+            <div>
+                <form class="d-flex" action="{% url 'djangoapp:login' %}" method="post">
+                    {% csrf_token %}
+                    <input class="form-control me-2" type="text" placeholder="Username" name="username">
+                    <input class="form-control me-2" type="password" placeholder="Password" name="psw">
+                    <button class="btn btn-outline-primary" type="submit">Login</button>
+                    <a class="btn btn-outline-secondary text-nowrap" type="submit"  href="{% url 'djangoapp:registration' %}">Sign-Up</a>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
 
     <!--Add a dealer table here -->
+    <table class="table" id="table" data-filter-control="true">
+        <thead>
+            <tr>
+                <th data-field="id">ID</th>
+                <th data-field="full_name">Dealer Name</th>
+                <th data-field="address">Address</th>
+                <th data-field="city">City</th>
+                <th data-field="zip">Zip</th>
+                <th data-field="st" data-filter-control="select">State</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dealer in dealerships %}
+            <tr>
+                <td>{{dealer.id}}</td>
+                <td><a href="{% url 'djangoapp:dealer_details' dealer.id %}">{{dealer.full_name}}</a></td>
+                <td>{{dealer.address}}</td>
+                <td>{{dealer.city}}</td>
+                <td>{{dealer.zip}}</td>
+                <td>{{dealer.st}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
     </body>
+
+    <script>
+        $(function() {
+            $('#table').bootstrapTable()
+        })
+    </script>
 
 </html>
