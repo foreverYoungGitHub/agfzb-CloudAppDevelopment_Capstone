@@ -13,7 +13,7 @@
 
 </head>
 
-    <body>
+<body>
     <!-- Remove this line the first time you edit this file -->
     <!-- This is the index page of your Django app! -->
     <!--Add a nav bar here -->
@@ -26,22 +26,22 @@
             </div>
 
             {% if user.is_authenticated %}
-            <div>
-                <form class="d-flex" action="{% url 'djangoapp:logout' %}">
-                    <p>{{ user.first_name }} ({{ user.username }})</p>
-                    <button class="btn btn-outline-secondary text-nowrap" type="submit">Logout</button>
-                </form>
-            </div>
+            <li>
+                <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
+                <a class="btn btn-link" href="{% url 'djangoapp:logout' %}">Logout</a>
+            </li>
             {% else %}
-            <div>
-                <form class="d-flex" action="{% url 'djangoapp:login' %}" method="post">
+            <li>
+                <form class="form-inline" action="{% url 'djangoapp:login' %}" method="post">
                     {% csrf_token %}
-                    <input class="form-control me-2" type="text" placeholder="Username" name="username">
-                    <input class="form-control me-2" type="password" placeholder="Password" name="psw">
-                    <button class="btn btn-outline-primary" type="submit">Login</button>
-                    <a class="btn btn-outline-secondary text-nowrap" type="submit"  href="{% url 'djangoapp:registration' %}">Sign-Up</a>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Username" name="username">
+                        <input type="password" class="form-control" placeholder="Username" name="psw">
+                        <button class="btn btn-primary" type="submit">Login</button>
+                        <a class="btn btn-link" href="{% url 'djangoapp:registration' %}">Sign Up</a>
+                    </div>
                 </form>
-            </div>
+            </li>
             {% endif %}
         </div>
     </nav>
