@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
-from .models import CarModel, CarMake
+from .models import CarModel, CarMake, CarDealer
 from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf, post_request
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
@@ -79,7 +79,7 @@ def registration(request):
 def get_dealerships(request):
     if request.method == "GET":
         context = {}
-        url = "https://us-south.functions.appdomain.cloud/api/v1/web/53c92039-eb5a-4d6a-aec2-d39c2b2b781b/dealer83b/get_reviews"
+        url = "https://7d6362dc.us-south.apigw.appdomain.cloud/get-dealership-info/get-dealerships"
         # Get dealers from the URL
         dealerships = get_dealers_from_cf(url)
         # Concat all dealer's short name
@@ -94,7 +94,7 @@ def get_dealerships(request):
 def get_dealer_details(request, **kwargs):
     if request.method == "GET":
         context = {}
-        url = "https://us-south.functions.appdomain.cloud/api/v1/web/53c92039-eb5a-4d6a-aec2-d39c2b2b781b/dealer83b/get_reviews"
+        url = url = "https://7d6362dc.us-south.apigw.appdomain.cloud/api/dealership/api/review"
         # Get dealers from the URL
         reviews = get_dealer_reviews_from_cf(url, dealership=kwargs["dealership_id"])
         # Concat all dealer's short name
@@ -132,7 +132,7 @@ def add_review(request, **kwargs):
         data = {
             "doc": doc
         }
-        url = "https://us-south.functions.cloud.ibm.com/api/v1/namespaces/53c92039-eb5a-4d6a-aec2-d39c2b2b781b/actions/dealer83b/get_reviews"
+        url = "https://7d6362dc.us-south.apigw.appdomain.cloud/api/dealership/api/review"
         post_request(url, data=doc)
         post_review(json.dumps(data))
         return redirect("djangoapp:index")
