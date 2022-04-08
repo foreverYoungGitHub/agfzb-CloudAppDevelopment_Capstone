@@ -77,16 +77,62 @@ def registration(request):
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
-    context = {}
     if request.method == "GET":
+        context = {}
+        url = "https://us-south.functions.appdomain.cloud/api/v1/web/53c92039-eb5a-4d6a-aec2-d39c2b2b781b/dealer83b/get_reviews"
+        # Get dealers from the URL
+        dealerships = get_dealers_from_cf(url)
+        # Concat all dealer's short name
+        context = {
+            "dealerships": dealerships
+        }
+        # Return a list of dealer short name
         return render(request, 'djangoapp/index.html', context)
 
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
-# def get_dealer_details(request, dealer_id):
-# ...
+def get_dealer_details(request, **kwargs):
+    if request.method == "GET":
+        context = {}
+        url = "https://us-south.functions.appdomain.cloud/api/v1/web/53c92039-eb5a-4d6a-aec2-d39c2b2b781b/dealer83b/get_reviews"
+        # Get dealers from the URL
+        reviews = get_dealer_reviews_from_cf(url, dealership=kwargs["dealership_id"])
+        # Concat all dealer's short name
+        context['reviews'] = reviews
+        context['dealer'] = kwargs["dealership_id"]
+        # Return a list of dealer short name
+        return render(request, 'djangoapp/dealer_details.html', context)
 
 # Create a `add_review` view to submit a review
-# def add_review(request, dealer_id):
-# ...
+def add_review(request, **kwargs):
+    if request.method == "GET":
+        context = {}
+        cars_at_dealership = CarModel.objects.filter(dealer_id=kwargs['dealership_id'])
+        context['cars'] = cars_at_dealership
+        context['dealer'] = kwargs['dealership_id']
+        return render(request, 'djangoapp/add_review.html', context)
+    if request.method == "POST":
+        doc = {}
+        if request.POST['purchasecheck'] == 'true':
+            doc['name'] = request.POST['first_name'] + " " + request.POST['last_name']
+            doc['review'] = request.POST['content']
+            doc['purchase'] = True
+            doc['purchase_date'] = request.POST['purchasedate']
+            doc['dealership'] = kwargs['dealership_id']
+            car_breakdown = request.POST['car'].split("-")
+            doc['car_year'] = car_breakdown[2]
+            doc['car_make'] = car_breakdown[1]
+            doc['car_model'] = car_breakdown[0]
+        else:
+            doc['name'] = request.POST['first_name'] + " " + request.POST['last_name']
+            doc['review'] = request.POST['content']
+            doc['purchase'] = False
+            doc['dealership'] = kwargs['dealership_id']
 
+        data = {
+            "doc": doc
+        }
+        url = "https://us-south.functions.cloud.ibm.com/api/v1/namespaces/53c92039-eb5a-4d6a-aec2-d39c2b2b781b/actions/dealer83b/get_reviews"
+        post_request(url, data=doc)
+        post_review(json.dumps(data))
+        return redirect("djangoapp:index")
